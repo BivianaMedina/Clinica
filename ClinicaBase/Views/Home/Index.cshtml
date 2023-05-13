@@ -1,0 +1,27 @@
+﻿@model ClinicaBase.Responses.GeneralResponse
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@{
+    if (Model != null)
+    {
+        if (Model.Message != null)
+        {
+            if (Model.Succeed == 1)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @Model.Message
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+            }
+        }
+    }
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
