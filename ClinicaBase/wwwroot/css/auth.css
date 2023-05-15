@@ -7,6 +7,17 @@ body {
     background-color: aquamarine;
 }
 
+.inicio-container {
+    width: 85vw;
+    height: 80vh;
+    background-color: aliceblue;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    align-items: center;
+    align-self: center;
+}
 
 .main-container {
     width: 100%;
@@ -17,6 +28,8 @@ body {
     justify-content: space-evenly;
     flex-wrap: wrap;
     align-items: center;
+    margin: 0;
+    padding: 0;
 }
 
 .img-inicial {

@@ -1,20 +1,32 @@
-﻿using ClinicaBase.Models.ViewModels;
+﻿using ClinicaBase.Data;
+using ClinicaBase.Models.DTOs;
+using ClinicaBase.Models.ViewModels;
 using ClinicaBase.Responses;
 using ClinicaBase.Services.ServicioUsuarios;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ClinicaBase.Controllers
 {
     public class AuthController : Controller
     {
         private readonly IServicioUsuarios _servicioUsuarios;
+        private readonly ClinicaBase1Context _context;
 
-        public AuthController(IServicioUsuarios servicioUsuarios)
+        public AuthController(IServicioUsuarios servicioUsuarios, ClinicaBase1Context context)
         {
             _servicioUsuarios = servicioUsuarios;
+            _context = context;
         }
 
+        [HttpGet]
+        public IActionResult Inicio()
+        {
+            return View();
+        }
 
         [HttpGet]
         [AllowAnonymous]
@@ -43,7 +55,22 @@ namespace ClinicaBase.Controllers
                 return View(request);
             }
 
-            Console.WriteLine(response.Data);
+            var userClaims = (UserClaimsDTO)response.Data!;            
+
+            var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role);
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userClaims.Documento.ToString()));
+            identity.AddClaim(new Claim(ClaimTypes.Name, userClaims.Nombres.Trim() + " " + userClaims.Apellidos.Trim()));
+            identity.AddClaim(new Claim(ClaimTypes.Role, userClaims.Rol));
+
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                principal, new AuthenticationProperties
+                {
+                    ExpiresUtc = DateTime.Now.AddHours(1),
+                    IsPersistent = true
+                });
+
             return RedirectToAction("Index", "Home");
         }
 

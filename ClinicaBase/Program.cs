@@ -1,6 +1,7 @@
 using ClinicaBase.Data;
 using ClinicaBase.Services.ServicioHash;
 using ClinicaBase.Services.ServicioUsuarios;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -16,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 //    .Build();
 
 
-builder.Services.AddHttpContextAccessor(); //PENDIENTE
+//builder.Services.AddHttpContextAccessor(); //PENDIENTE
 
 
 builder.Services.AddControllersWithViews(options =>
@@ -27,7 +28,7 @@ builder.Services.AddControllersWithViews(options =>
 
 builder.Services.AddScoped<IServicioUsuarios, ServicioUsuarios>();
 builder.Services.AddScoped<IServicioHash, ServicioHash256>();
-builder.Services.AddScoped<IServicioToken, ServicioToken>();
+builder.Services.AddScoped<IServicioClaims, ServicioCookies>();
 
 
 builder.Services.AddDbContext<ClinicaBase1Context>( options =>
@@ -37,21 +38,19 @@ builder.Services.AddDbContext<ClinicaBase1Context>( options =>
 });
 
 
-builder.Services.AddAuthentication(d => {
-    d.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    d.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(options => {
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie(options =>
+{
+    options.LoginPath = "/Auth/Login";
+    options.Events.OnRedirectToAccessDenied = context =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            SaveSigninToken = true, //PENDIENTE
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Secret"])),
-            ValidateIssuer = false,
-            ValidateAudience = false
-        };
-    });
+        context.Response.Redirect("/Home/Index");
+        return Task.CompletedTask; //con esto ya no me redirecciona a la pagia que viene por defecto
+    };
+});
 
 
 //builder.Services.AddAuthentication();
@@ -77,6 +76,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Auth}/{action=Login}/{id?}");
+    pattern: "{controller=Auth}/{action=Inicio}/{id?}");
 
 app.Run();
