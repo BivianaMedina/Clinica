@@ -16,7 +16,7 @@ namespace ClinicaBase.Controllers
         private readonly IServicioUsuarios _servicioUsuarios;
         private readonly ClinicaBase1Context _context;
 
-        public AuthController(IServicioUsuarios servicioUsuarios, ClinicaBase1Context context)
+        public AuthController(IServicioUsuarios servicioUsuarios,ClinicaBase1Context context)
         {
             _servicioUsuarios = servicioUsuarios;
             _context = context;
@@ -32,6 +32,11 @@ namespace ClinicaBase.Controllers
         [AllowAnonymous]
         public IActionResult Login()
         {
+            if (User.Identity!.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return View();
         }
 
@@ -72,6 +77,17 @@ namespace ClinicaBase.Controllers
                 });
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {            
+            if (User.Identity!.IsAuthenticated)
+            {
+                await HttpContext.SignOutAsync();
+                return RedirectToAction("Login");
+            }
+            return RedirectToAction("Home");
         }
 
 

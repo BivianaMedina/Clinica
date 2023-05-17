@@ -1,22 +1,11 @@
 using ClinicaBase.Data;
 using ClinicaBase.Services.ServicioHash;
+using ClinicaBase.Services.ServicioPacientes;
 using ClinicaBase.Services.ServicioUsuarios;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-//var politicaUsuariosAutenticados = new AuthorizationPolicyBuilder()
-//    .RequireAuthenticatedUser()
-//    .Build();
-
-
 //builder.Services.AddHttpContextAccessor(); //PENDIENTE
 
 
@@ -26,12 +15,13 @@ builder.Services.AddControllersWithViews(options =>
 });
 
 
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IServicioUsuarios, ServicioUsuarios>();
 builder.Services.AddScoped<IServicioHash, ServicioHash256>();
-builder.Services.AddScoped<IServicioClaims, ServicioCookies>();
+builder.Services.AddScoped<IServicioPaciente, ServicioPaciente>();
 
 
-builder.Services.AddDbContext<ClinicaBase1Context>( options =>
+builder.Services.AddDbContext<ClinicaBase1Context>(options =>
 {
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
     options.UseSqlServer(builder.Configuration.GetConnectionString("Connection"));
@@ -51,9 +41,6 @@ builder.Services.AddAuthentication(options => {
         return Task.CompletedTask; //con esto ya no me redirecciona a la pagia que viene por defecto
     };
 });
-
-
-//builder.Services.AddAuthentication();
 
 var app = builder.Build();
 

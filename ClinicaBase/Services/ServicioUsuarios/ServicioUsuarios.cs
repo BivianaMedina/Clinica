@@ -13,7 +13,7 @@ namespace ClinicaBase.Services.ServicioUsuarios
     {
         private readonly ClinicaBase1Context _context;
         private readonly IServicioHash _servicioHash;
-        
+
         private const string GeneralError = "Se ha generado un error inesperado";
         private const string UserOrPasswordNotFound = "El usuario o contraseña no coinciden";
 
@@ -37,7 +37,8 @@ namespace ClinicaBase.Services.ServicioUsuarios
             }
 
             NewRegisterModel(request, out User? newRequestModel);
-            if (newRequestModel == null){
+            if (newRequestModel == null)
+            {
                 response.Succeed = 0;
                 response.Message = GeneralError;
                 return response;
@@ -52,7 +53,7 @@ namespace ClinicaBase.Services.ServicioUsuarios
             }
             newRequestModel.Contrasena = hashPasswordSalt;
             newRequestModel.Sal = salt;
-            response = await CreateUser(newRequestModel); 
+            response = await CreateUser(newRequestModel);
             return response;
         }
 
@@ -104,7 +105,7 @@ namespace ClinicaBase.Services.ServicioUsuarios
                 {
                     response = true;
                 }
-                
+
             }
             catch (Exception)
             {

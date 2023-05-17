@@ -21,7 +21,7 @@ public partial class Patient
 
     [StringLength(255)]
     [Unicode(false)]
-    public string Correo { get; set; } = null!;
+    public string? Correo { get; set; }
 
     [StringLength(150)]
     [Unicode(false)]
