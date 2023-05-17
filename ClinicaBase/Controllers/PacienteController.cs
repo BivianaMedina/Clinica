@@ -21,12 +21,14 @@ namespace ClinicaBase.Controllers
             _servicioPaciente = servicioPaciente;
         }
 
+
         [Authorize(Roles = "Admin,Medico,Enfermeria")]
         [HttpGet]
         public IActionResult Agregar()
         {
             return View();
         }
+
 
         [Authorize(Roles = "Admin,Medico,Enfermeria")]
         [HttpPost]
@@ -57,6 +59,7 @@ namespace ClinicaBase.Controllers
             }
             return RedirectToAction("Index", "Home");
         }
+
 
         [Authorize(Roles = "Admin, Enfermeria")]
         [HttpGet]
