@@ -1,6 +1,6 @@
 ﻿namespace ClinicaBase.Models.DTOs
 {
-    public class UserTokenClaimsDTO
+    public class UserClaimsDTO
     {
         public int Documento { get; set; }
 

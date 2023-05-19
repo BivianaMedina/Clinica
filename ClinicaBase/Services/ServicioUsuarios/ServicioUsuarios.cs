@@ -13,18 +13,17 @@ namespace ClinicaBase.Services.ServicioUsuarios
     {
         private readonly ClinicaBase1Context _context;
         private readonly IServicioHash _servicioHash;
-        private readonly IServicioToken _servicioToken;
 
         private const string GeneralError = "Se ha generado un error inesperado";
         private const string UserOrPasswordNotFound = "El usuario o contraseña no coinciden";
 
-        public ServicioUsuarios(ClinicaBase1Context context, IServicioHash servicioHash,
-            IServicioToken servicioToken)
+        public ServicioUsuarios(ClinicaBase1Context context, IServicioHash servicioHash)
         {
             _context = context;
             _servicioHash = servicioHash;
-            _servicioToken = servicioToken;
+
         }
+
 
         public async Task<GeneralResponse> AddUsuario(RegisterViewModel request)
         {
@@ -38,7 +37,8 @@ namespace ClinicaBase.Services.ServicioUsuarios
             }
 
             NewRegisterModel(request, out User? newRequestModel);
-            if (newRequestModel == null){
+            if (newRequestModel == null)
+            {
                 response.Succeed = 0;
                 response.Message = GeneralError;
                 return response;
@@ -53,7 +53,7 @@ namespace ClinicaBase.Services.ServicioUsuarios
             }
             newRequestModel.Contrasena = hashPasswordSalt;
             newRequestModel.Sal = salt;
-            response = await CreateUser(newRequestModel); 
+            response = await CreateUser(newRequestModel);
             return response;
         }
 
@@ -75,7 +75,7 @@ namespace ClinicaBase.Services.ServicioUsuarios
                 return response;
             }
 
-            UserTokenClaimsDTO userClaims = new()
+            UserClaimsDTO userClaims = new()
             {
                 Documento = user.Documento,
                 Nombres = user.Nombres,
@@ -83,17 +83,11 @@ namespace ClinicaBase.Services.ServicioUsuarios
                 Rol = user.Rol
             };
 
-            string? jwt = _servicioToken.CreateToken(userClaims);
+            response.Succeed = 1;
+            response.Data = userClaims;
+            response.Message = null;
 
-            if (jwt == null)
-            {
-                response.Message = GeneralError;
-            }
-            else
-            {
-                response.Succeed = 1;
-                response.Data = jwt;
-            }
+
             return response;
         }
 
@@ -111,7 +105,7 @@ namespace ClinicaBase.Services.ServicioUsuarios
                 {
                     response = true;
                 }
-                
+
             }
             catch (Exception)
             {

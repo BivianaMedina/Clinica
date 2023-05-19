@@ -1,4 +1,6 @@
-﻿@model ClinicaBase.Responses.GeneralResponse
+﻿@using System.Security.Claims
+
+@model ClinicaBase.Responses.GeneralResponse
 
 @{
     ViewData["Title"] = "Home Page";
@@ -11,17 +13,117 @@
         {
             if (Model.Succeed == 1)
             {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @Model.Message
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="container">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @Model.Message
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                 </div>
+                
+            }
 
+            if (Model.Succeed == 0)
+            {
+                <div class="container">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @Model.Message
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+                
             }
         }
     }
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@{
+    
+    string? rol = User.FindFirstValue(ClaimTypes.Role);
+
+    if (rol == "Admin") 
+    {
+        <div class="home-cards-container">
+            <div class="card text-center" style="width: 18rem;">
+                <img src="~/img/nuevo-paciente.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title mb-2">Nuevo Paciente</h5>
+                    <a asp-controller="Paciente" asp-action="Agregar" class="btn btn-primary">Agregar Nuevo Paciente</a>
+                </div>
+            </div>
+
+            <div class="card text-center" style="width: 18rem;">
+                <img src="~/img/revision-medica.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title mb-2">Pacientes</h5>
+                    <a asp-controller="Paciente" asp-action="BuscarPaciente" class="btn btn-primary">Ir a Pacientes</a>
+                </div>
+            </div>           
+
+            <div class="card text-center" style="width: 18rem;">
+                <img src="~/img/empleados-consultorio.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title mb-2">Empleados</h5>
+                    <a href="#" class="btn btn-primary">Manejo de Empleados</a>
+                </div>
+            </div>
+        </div>
+    }
+    else if (rol == "Medico")
+    {
+        <div class="home-cards-container">
+            <div class="card text-center" style="width: 18rem;">
+                <img src="~/img/nuevo-paciente.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title mb-2">Nuevo Paciente</h5>
+                    <a asp-controller="Paciente" asp-action="Agregar" class="btn btn-primary">Agregar Nuevo Paciente</a>
+                </div>
+            </div>
+
+            <div class="card text-center" style="width: 18rem;">
+                <img src="~/img/revision-medica.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title mb-2">Pacientes</h5>
+                    <a asp-controller="Paciente" asp-action="BuscarPaciente" class="btn btn-primary">Ir a Pacientes</a>
+                </div>
+            </div>
+        </div>
+    }
+    else if (rol == "Enfermeria")
+    {
+        <div class="home-cards-container">
+            <div class="card text-center" style="width: 18rem;">
+                <img src="~/img/nuevo-paciente.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title mb-2">Nuevo Paciente</h5>
+                    <a asp-controller="Paciente" asp-action="Agregar" class="btn btn-primary">Agregar Nuevo Paciente</a>
+                </div>
+            </div>
+
+            <div class="card text-center" style="width: 18rem;">
+                <img src="~/img/revision-medica.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title mb-2">Pacientes</h5>
+                    <a asp-controller="Paciente" asp-action="BuscarPaciente" class="btn btn-primary">Ir a Pacientes</a>
+                </div>
+            </div>
+        </div>
+    }
+    else if (rol == "Recursos Humanos")
+    {
+        <div class="home-cards-container">       
+            <div class="card text-center" style="width: 18rem;">
+                <img src="~/img/empleados-consultorio.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title mb-2">Empleados</h5>
+                    <a href="#" class="btn btn-primary">Manejo de Empleados</a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="mt-5 text-center">
+            <h1>Te Damos la Bienvenida</h1>
+        </div>
+    }
+}

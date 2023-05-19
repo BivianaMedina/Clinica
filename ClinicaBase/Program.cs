@@ -1,22 +1,12 @@
 using ClinicaBase.Data;
 using ClinicaBase.Services.ServicioHash;
+using ClinicaBase.Services.ServicioPacientes;
 using ClinicaBase.Services.ServicioUsuarios;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-//var politicaUsuariosAutenticados = new AuthorizationPolicyBuilder()
-//    .RequireAuthenticatedUser()
-//    .Build();
-
-
-builder.Services.AddHttpContextAccessor(); //PENDIENTE
+//builder.Services.AddHttpContextAccessor(); //PENDIENTE
 
 
 builder.Services.AddControllersWithViews(options =>
@@ -25,36 +15,32 @@ builder.Services.AddControllersWithViews(options =>
 });
 
 
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IServicioUsuarios, ServicioUsuarios>();
 builder.Services.AddScoped<IServicioHash, ServicioHash256>();
-builder.Services.AddScoped<IServicioToken, ServicioToken>();
+builder.Services.AddScoped<IServicioPaciente, ServicioPaciente>();
 
 
-builder.Services.AddDbContext<ClinicaBase1Context>( options =>
+builder.Services.AddDbContext<ClinicaBase1Context>(options =>
 {
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
     options.UseSqlServer(builder.Configuration.GetConnectionString("Connection"));
 });
 
 
-builder.Services.AddAuthentication(d => {
-    d.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    d.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(options => {
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie(options =>
+{
+    options.LoginPath = "/Auth/Login";
+    options.Events.OnRedirectToAccessDenied = context =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            SaveSigninToken = true, //PENDIENTE
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Secret"])),
-            ValidateIssuer = false,
-            ValidateAudience = false
-        };
-    });
-
-
-//builder.Services.AddAuthentication();
+        context.Response.Redirect("/Home/Index");
+        return Task.CompletedTask; //con esto ya no me redirecciona a la pagia que viene por defecto
+    };
+});
 
 var app = builder.Build();
 
@@ -77,6 +63,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Auth}/{action=Login}/{id?}");
+    pattern: "{controller=Auth}/{action=Inicio}/{id?}");
 
 app.Run();
